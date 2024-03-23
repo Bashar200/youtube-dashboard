@@ -5,7 +5,8 @@ import logging
 from aiokafka import AIOKafkaConsumer
 from dateutil.parser import parse
 from motor.motor_asyncio import AsyncIOMotorClient
-from settings import DATA_GENERATOR_KAFKA_TOPIC, KAFKA_BOOTSTRAP_SERVER, MONGODB_URL
+from settings import (DATA_GENERATOR_KAFKA_TOPIC, KAFKA_BOOTSTRAP_SERVER,
+                      MONGODB_URL)
 
 logger = logging.getLogger(__name__)
 

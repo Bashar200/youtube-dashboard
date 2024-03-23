@@ -3,6 +3,7 @@ import json
 import logging
 import os
 from contextlib import asynccontextmanager
+from datetime import datetime, timedelta
 
 import googleapiclient.discovery
 import pytz
@@ -10,7 +11,7 @@ from aiokafka import AIOKafkaProducer
 from dateutil.parser import parse
 from fastapi import FastAPI
 from googleapiclient.errors import HttpError
-from datetime import datetime, timedelta
+
 from app.database import get_database
 from app.producer import init_producer
 from app.settings import DATA_GENERATOR_KAFKA_TOPIC, GOOGLE_API_KEY
@@ -25,20 +26,27 @@ async def fetch_new_api_key_and_update_old_keys(developer_key):
         filter={
             "key": developer_key,
         },
-        update={"$set": {"last_active": datetime.now(), "key":developer_key, "active": False}},
-        upsert=True
+        update={
+            "$set": {
+                "last_active": datetime.now(),
+                "key": developer_key,
+                "active": False,
+            }
+        },
+        upsert=True,
     )
     await collection.update_many(
         filter={
             "last_active": {"$lt": datetime.now() - timedelta(hours=24)},
         },
-        update={"$set": {"active": True}}
+        update={"$set": {"active": True}},
     )
     res = await collection.find({"active": True}).to_list(None)
     if not res:
-        logger.warning("api keys exhausted!! add/create new keys or wait for oldest key to replenish")
+        logger.warning(
+            "api keys exhausted!! add/create new keys or wait for oldest key to replenish"
+        )
     return res[0] if res else []
-    
 
 
 async def gather_information(
@@ -93,7 +101,7 @@ async def fetch_and_save_youtube_videos_metadata():
             await asyncio.gather(*raw_stream_data)
         if not success:
             new_api_key = await fetch_new_api_key_and_update_old_keys(developer_key)
-            developer_key = new_api_key.get("key") if new_api_key else developer_key 
+            developer_key = new_api_key.get("key") if new_api_key else developer_key
 
         await asyncio.sleep(100)
 

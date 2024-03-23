@@ -6,8 +6,14 @@ async def get_youtube_contents(*args, **kwargs):
     filter_condition = {}
     if search:
         search = search.split(" ")
-        title_filter = [{"title": {"$regex": partial_filter, "$options": "i"}} for partial_filter in search]
-        description_filter = [{"description": {"$regex": partial_filter, "$options": "i"}} for partial_filter in search]
+        title_filter = [
+            {"title": {"$regex": partial_filter, "$options": "i"}}
+            for partial_filter in search
+        ]
+        description_filter = [
+            {"description": {"$regex": partial_filter, "$options": "i"}}
+            for partial_filter in search
+        ]
         filter_condition.update(
             {
                 "$or": [
