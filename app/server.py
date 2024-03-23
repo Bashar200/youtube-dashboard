@@ -12,8 +12,6 @@ extra = {"app_name": SERVICE_NAME}
 logger = logging.getLogger(__name__)
 app = FastAPI(lifespan=lifespan)
 
-# app = FastAPI()
-
 app.include_router(route, tags=["version 1.0"], prefix=f"{BASE_ROUTE}/v1")
 
 

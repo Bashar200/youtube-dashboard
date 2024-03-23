@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+
 from aiokafka import AIOKafkaConsumer
 from dateutil.parser import parse
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -35,7 +36,7 @@ async def consume():
                     "publish_time": parse(value.get("snippet").get("publishTime")),
                     "thumbnails": value.get("snippet").get("thumbnails"),
                 }
-                youtube_details.update_one(
+                await youtube_details.update_one(
                     filter={
                         "video_id": insert_payload["video_id"],
                         "channel_id": insert_payload["channel_id"],
