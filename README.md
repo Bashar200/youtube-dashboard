@@ -1,6 +1,6 @@
 # FastAPI Microservice to fetch YouTube Data
 
-This is a FastAPI-based microservice that integrates with MongoDB and Kafka. It provides an background thread to hit an API at an interval of 1 minute and includes a GET API with search functionality.
+This is a FastAPI-based microservice that integrates with MongoDB and Kafka. It provides an background thread to hit an API at an interval of 1 minute and includes a GET API with search functionality and another API to regsiter google api keys if exhausted.
 
 ## Features
 
@@ -9,6 +9,7 @@ This is a FastAPI-based microservice that integrates with MongoDB and Kafka. It 
 - **Kafka**: A distributed event streaming platform used for building real-time data pipelines and streaming applications.
 - **API Hitting**: Daemon thread hits an external API at an interval of 1 minute.
 - **GET API with Search Functionality**: Provides a GET endpoint to search data stored in MongoDB.
+- **POST API for API-KEY Registration**: Provides a POST endpoint to register key (few keys are already set by default).
 
 ## Requirements
 
@@ -35,3 +36,5 @@ This is a FastAPI-based microservice that integrates with MongoDB and Kafka. It 
 1. Access swagger docs at 
    ```bash
    http://localhost:8081/docs
+
+2. Use GET API to perform necessary searches using swagger

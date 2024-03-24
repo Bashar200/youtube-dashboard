@@ -67,6 +67,16 @@ services:
       - kafka-net
     restart: always
 
+  setup_defaults:
+    build:
+      context: ./
+      dockerfile: Dockerfile.default
+    container_name: setup-credentials-and-indexes
+    depends_on:
+      - mongodb
+    networks:
+      - kafka-net
+
 volumes:
   mongodb_data:
 

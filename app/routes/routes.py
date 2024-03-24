@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.database import get_database, get_redis
-from app.services.services import get_youtube_contents
+from app.services.services import get_youtube_contents, save_api_key
 
 route = APIRouter()
 
@@ -31,7 +31,7 @@ async def create_dashboard(
         _type_: JSONResponse
         returns: json reponse data with youtube content
     """
-    logger.info("/create.routes")
+    logger.info("create_dashboard")
     res = await get_youtube_contents(
         db, redis_client, search, page=page, page_size=page_size
     )
@@ -41,5 +41,35 @@ async def create_dashboard(
             "data": res,
             "message": "successfully fetch youtube content data",
             "success": True,
+        },
+    )
+
+
+@route.post("/save/api-key")
+async def save_key(
+    db: AsyncIOMotorDatabase = Depends(get_database),
+    key: str = Query(None, min_length=1),
+):
+    """_summary_
+
+    Args:
+        db (AsyncIOMotorDatabase, optional): _description_. Defaults to Depends(get_database).
+        key (str, optional): api-key. Defaults to Query(None, min_length=1).
+
+    Returns:
+        _type_: returns if key inserted on not
+    """
+    logger.info("save_key")
+    res = await save_api_key(db, key)
+    return JSONResponse(
+        status_code=(
+            status.HTTP_200_OK if res else status.HTTP_500_INTERNAL_SERVER_ERROR
+        ),
+        content={
+            "data": [],
+            "message": (
+                "successfully saved api key" if res else "failed to saved api key"
+            ),
+            "success": True if res else False,
         },
     )

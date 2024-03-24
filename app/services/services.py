@@ -1,3 +1,6 @@
+import re
+
+
 async def get_youtube_contents(*args, **kwargs):
     """
     fetch data from dashboard database and youtube-details collection in desc order of publish_time
@@ -10,20 +13,22 @@ async def get_youtube_contents(*args, **kwargs):
     skip = (page - 1) * page_size
     filter_condition = {}
     if search:
-        search = search.split(" ")
-        title_filter = [
-            {"title": {"$regex": partial_filter, "$options": "i"}}
-            for partial_filter in search
-        ]
-        description_filter = [
-            {"description": {"$regex": partial_filter, "$options": "i"}}
-            for partial_filter in search
-        ]
+        search = re.sub(r"[^\w\s]", "", search).split(" ") # Remove any special symbols and do text based search
         filter_condition.update(
             {
-                "$or": [
-                    *title_filter,
-                    *description_filter,
+                "$and": [
+                    {
+                        "$or": [
+                            {"title": {"$regex": partial_filter, "$options": "i"}},
+                            {
+                                "description": {
+                                    "$regex": partial_filter,
+                                    "$options": "i",
+                                }
+                            },
+                        ]
+                    }
+                    for partial_filter in search
                 ]
             }
         )
@@ -44,5 +49,17 @@ async def get_youtube_contents(*args, **kwargs):
             },
             res,
         )
+    )
+    return res
+
+
+async def save_api_key(*args) -> int:
+    db, key = args
+    res = await db["api-keys"].update_one(
+        filter={
+            "key": key,
+        },
+        update={"$set": {"active": True, "key": key}},
+        upsert=True,
     )
     return res

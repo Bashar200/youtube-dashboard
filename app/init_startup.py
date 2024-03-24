@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import random
-
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 
@@ -20,6 +19,7 @@ from app.settings import DATA_GENERATOR_KAFKA_TOPIC, GOOGLE_API_KEY
 
 logger = logging.getLogger(__name__)
 
+
 def random_date(start_date, end_date):
     """
     Generates a random date between start_date and end_date to increase randomness from API.
@@ -30,6 +30,7 @@ def random_date(start_date, end_date):
     random_days = random.randint(0, delta.days)
     random_date = start_datetime + timedelta(days=random_days)
     return random_date.strftime("%Y-%m-%d")
+
 
 async def fetch_new_api_key_and_update_old_keys(developer_key):
     """_summary_
@@ -90,7 +91,7 @@ async def gather_information(
     )
     start_date = "2023-01-01"
     end_date = "2024-01-01"
-    publishing_date = random_date(start_date,end_date)
+    publishing_date = random_date(start_date, end_date)
     published_after = parse(publishing_date)
     logger.info(f"NEW GENERATED DATE:: {publishing_date}")
     utc_timezone = pytz.utc
@@ -154,7 +155,7 @@ async def fetch_and_save_youtube_videos_metadata():
             new_api_key = await fetch_new_api_key_and_update_old_keys(developer_key)
             developer_key = new_api_key.get("key") if new_api_key else developer_key
 
-        await asyncio.sleep(10)
+        await asyncio.sleep(60) # 1 minute delay for next batch
 
 
 @asynccontextmanager
