@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def random_date(start_date, end_date):
     """
-    Generates a random date between start_date and end_date to maintain randomness.
+    Generates a random date between start_date and end_date to increase randomness from API.
     """
     start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
     end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
