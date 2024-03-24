@@ -1,0 +1,5 @@
+FROM python:3.8
+WORKDIR /setup_defaults
+COPY . /setup_defaults
+RUN pip install --no-cache-dir -r requirements.txt
+CMD ["python", "./setup_defaults/default_settings.py"]
