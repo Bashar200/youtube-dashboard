@@ -38,3 +38,7 @@ This is a FastAPI-based microservice that integrates with MongoDB and Kafka. It 
    http://localhost:8081/docs
 
 2. Use GET API to perform necessary searches using swagger
+
+## Note
+
+Please wait for few minutes if keys are exhausted next key is selected after default delay of 1 minute and result is stored in database
