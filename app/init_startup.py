@@ -2,6 +2,8 @@ import asyncio
 import json
 import logging
 import os
+import random
+
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 
@@ -18,6 +20,16 @@ from app.settings import DATA_GENERATOR_KAFKA_TOPIC, GOOGLE_API_KEY
 
 logger = logging.getLogger(__name__)
 
+def random_date(start_date, end_date):
+    """
+    Generates a random date between start_date and end_date to maintain randomness.
+    """
+    start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+    end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+    delta = end_datetime - start_datetime
+    random_days = random.randint(0, delta.days)
+    random_date = start_datetime + timedelta(days=random_days)
+    return random_date.strftime("%Y-%m-%d")
 
 async def fetch_new_api_key_and_update_old_keys(developer_key):
     """_summary_
@@ -76,7 +88,11 @@ async def gather_information(
     youtube = googleapiclient.discovery.build(
         "youtube", "v3", developerKey=developer_key
     )
-    published_after = parse("2023-01-01")
+    start_date = "2023-01-01"
+    end_date = "2024-01-01"
+    publishing_date = random_date(start_date,end_date)
+    published_after = parse(publishing_date)
+    logger.info(f"NEW GENERATED DATE:: {publishing_date}")
     utc_timezone = pytz.utc
     published_after = published_after.astimezone(utc_timezone).strftime(
         "%Y-%m-%dT%H:%M:%SZ"

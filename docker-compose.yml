@@ -37,7 +37,6 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL_SAME_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: youtube-stream
     networks:
       - kafka-net
 
@@ -63,6 +62,7 @@ services:
       - mongodb
       - redis
       - kafka
+      - youtube_dashboard
     networks:
       - kafka-net
     restart: always
