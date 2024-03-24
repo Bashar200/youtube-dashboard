@@ -18,6 +18,19 @@ async def create_dashboard(
     page: int = Query(1, gt=0),
     page_size: int = Query(10, gt=0, le=100),
 ):
+    """_summary_
+
+    Args:
+        db (AsyncIOMotorDatabase, optional): database context for GET API data aggregation. Defaults to Depends(get_database).
+        redis_client (_type_, optional): redis_client for caching. Defaults to Depends(get_redis).
+        search (str, optional): search parameter. Defaults to Query(None, min_length=1).
+        page (int, optional): current page for pagination. Defaults to 1.
+        page_size (int, optional): total records on a single page. Defaults to 10.
+
+    Returns:
+        _type_: JSONResponse
+        returns: json reponse data with youtube content
+    """
     logger.info("/create.routes")
     res = await get_youtube_contents(
         db, redis_client, search, page=page, page_size=page_size

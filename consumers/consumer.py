@@ -12,14 +12,18 @@ logger = logging.getLogger(__name__)
 
 
 async def consume():
-    consumer = AIOKafkaConsumer(
-        DATA_GENERATOR_KAFKA_TOPIC,
-        bootstrap_servers=KAFKA_BOOTSTRAP_SERVER,
-        group_id="youtube-dashboard-service-group-8",
-        auto_offset_reset="earliest",
-        enable_auto_commit=True,
-    )
-
+    """consumer message , transform payload and dump to database
+    """
+    try:
+        consumer = AIOKafkaConsumer(
+            DATA_GENERATOR_KAFKA_TOPIC,
+            bootstrap_servers=KAFKA_BOOTSTRAP_SERVER,
+            group_id="youtube-dashboard-service-group-9",
+            auto_offset_reset="earliest",
+            enable_auto_commit=True,
+        )
+    except Exception as e:
+        exit()
     await consumer.start()
     try:
         client = AsyncIOMotorClient(MONGODB_URL)
@@ -37,6 +41,7 @@ async def consume():
                     "publish_time": parse(value.get("snippet").get("publishTime")),
                     "thumbnails": value.get("snippet").get("thumbnails"),
                 }
+                logger.debug(f"{insert_payload}")
                 await youtube_details.update_one(
                     filter={
                         "video_id": insert_payload["video_id"],

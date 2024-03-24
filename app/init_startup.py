@@ -20,6 +20,17 @@ logger = logging.getLogger(__name__)
 
 
 async def fetch_new_api_key_and_update_old_keys(developer_key):
+    """_summary_
+    1. As soon as error raised via HttpError this flow will begin
+    2. Since api key renew after 24 hours the current time of exhaustion is added to separate collection of api-keys to the document
+    3. Select new api key which is still valid or active
+    4. Set active true to all keys which has delta > 24 hours 
+    Args:
+        developer_key (_type_): google api-key
+
+    Returns:
+        active developer_key
+    """
     database = await get_database()
     collection = database["api-keys"]
     await collection.update_one(
@@ -52,6 +63,16 @@ async def fetch_new_api_key_and_update_old_keys(developer_key):
 async def gather_information(
     query: str, max_results: int = 10, developer_key=GOOGLE_API_KEY
 ) -> tuple:
+    """_summary_
+
+    Args:
+        query (str): _description_
+        max_results (int, optional): _description_. Defaults to 10.
+        developer_key (_type_, optional): _description_. Defaults to GOOGLE_API_KEY.
+
+    Returns:
+        tuple: _description_
+    """
     youtube = googleapiclient.discovery.build(
         "youtube", "v3", developerKey=developer_key
     )
@@ -81,12 +102,26 @@ async def gather_information(
 
 
 async def produce_data_to_extractor_stream(data: dict, producer: AIOKafkaProducer):
+    """produce data to topic
+
+    Args:
+        data (dict): payload to produce
+        producer (AIOKafkaProducer): producer client
+    """
     await producer.send(
         DATA_GENERATOR_KAFKA_TOPIC, value=json.dumps(data).encode("utf-8")
     )
 
 
 async def fetch_and_save_youtube_videos_metadata():
+    """
+    Task-1: fetch data from API 
+    Task-2: send fetched data to consumer using kafka producer client
+    
+    Result:
+    Separation of consumer and insertion of data to achieve scalable solution
+    We can individually scale consumer for faster ingestion of data
+    """
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
     producer = await init_producer()
     developer_key = GOOGLE_API_KEY
@@ -98,16 +133,21 @@ async def fetch_and_save_youtube_videos_metadata():
             raw_stream_data = [
                 produce_data_to_extractor_stream(record, producer) for record in data
             ]
-            await asyncio.gather(*raw_stream_data)
+            await asyncio.gather(*raw_stream_data) # parallely send data to producer
         if not success:
             new_api_key = await fetch_new_api_key_and_update_old_keys(developer_key)
             developer_key = new_api_key.get("key") if new_api_key else developer_key
 
-        await asyncio.sleep(100)
+        await asyncio.sleep(10)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """create background thread to fetch youtube search data and send to consumer for insertion
+
+    Args:
+        app (FastAPI): _description_
+    """
     asyncio.create_task(
         fetch_and_save_youtube_videos_metadata(), name="gather_youtube_data"
     )

@@ -1,4 +1,9 @@
 async def get_youtube_contents(*args, **kwargs):
+    """
+    fetch data from dashboard database and youtube-details collection in desc order of publish_time 
+    Returns:
+        _type_: dict
+    """
     db, _, search = args
     page = kwargs["page"]
     page_size = kwargs["page_size"]
@@ -30,6 +35,7 @@ async def get_youtube_contents(*args, **kwargs):
         .limit(page_size)
         .to_list(length=None)
     )
+    # Modify _id from ObjectId to string and Datetime field to string for jsonification
     res = list(
         map(
             lambda val: {
