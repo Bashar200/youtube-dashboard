@@ -1,6 +1,6 @@
 async def get_youtube_contents(*args, **kwargs):
     """
-    fetch data from dashboard database and youtube-details collection in desc order of publish_time 
+    fetch data from dashboard database and youtube-details collection in desc order of publish_time
     Returns:
         _type_: dict
     """

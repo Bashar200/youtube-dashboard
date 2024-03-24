@@ -24,7 +24,7 @@ async def fetch_new_api_key_and_update_old_keys(developer_key):
     1. As soon as error raised via HttpError this flow will begin
     2. Since api key renew after 24 hours the current time of exhaustion is added to separate collection of api-keys to the document
     3. Select new api key which is still valid or active
-    4. Set active true to all keys which has delta > 24 hours 
+    4. Set active true to all keys which has delta > 24 hours
     Args:
         developer_key (_type_): google api-key
 
@@ -115,9 +115,9 @@ async def produce_data_to_extractor_stream(data: dict, producer: AIOKafkaProduce
 
 async def fetch_and_save_youtube_videos_metadata():
     """
-    Task-1: fetch data from API 
+    Task-1: fetch data from API
     Task-2: send fetched data to consumer using kafka producer client
-    
+
     Result:
     Separation of consumer and insertion of data to achieve scalable solution
     We can individually scale consumer for faster ingestion of data
@@ -133,7 +133,7 @@ async def fetch_and_save_youtube_videos_metadata():
             raw_stream_data = [
                 produce_data_to_extractor_stream(record, producer) for record in data
             ]
-            await asyncio.gather(*raw_stream_data) # parallely send data to producer
+            await asyncio.gather(*raw_stream_data)  # parallely send data to producer
         if not success:
             new_api_key = await fetch_new_api_key_and_update_old_keys(developer_key)
             developer_key = new_api_key.get("key") if new_api_key else developer_key

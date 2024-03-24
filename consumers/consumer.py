@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 async def consume():
-    """consumer message , transform payload and dump to database
-    """
+    """consumer message , transform payload and dump to database"""
     try:
         consumer = AIOKafkaConsumer(
             DATA_GENERATOR_KAFKA_TOPIC,
